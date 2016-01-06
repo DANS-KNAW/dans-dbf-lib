@@ -6,7 +6,7 @@ DANS DBF Library - Read and write DBF database files.
 DESCRIPTION
 ===========
 
-Java library to read and write the contents of old [DBF] (dBase) databases. It was produced for the [MIXED] project.
+Java library to read and write the contents of old [DBF] \(dBase) databases. It was produced for the [MIXED] project.
 It is no longer maintained. You are however free to fork it, if you wish. 
 
 There are no JavaDocs online, but they can be built locally with `mvn javadoc:javadoc`. After this they should 
