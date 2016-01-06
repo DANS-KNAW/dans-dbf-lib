@@ -1,0 +1,125 @@
+Welcome
+
+    DANS DBF Library is a Java library for reading and writing xBase database files.
+xBase is the name commonly used for dBase and its dialects.  The central file in
+these databases is the DBF file or DataBase File, hence the name of this library.
+
+    DANS is a Dutch electronic archiving institute under the auspices of Royal
+Netherlands Academy of Arts and Sciences (KNAW) and partially funded by the Netherlands
+Organisation of Scientific Research (NWO).  It is the initiator of this
+project.  DANS is making this library available under the GNU Public Licence. For
+more information about DANS, see {{{http://www.dans.knaw.nl/en}the DANS website}}.
+This library is used by DANS for the {{{http://mixed.dans.knaw.nl}MIXED Project}}.
+
+News
+
+* 6 August 2012.  Beta 10.
+
+  Applied patches by Pavel Kuzmenko, who solved a bug that appeared when the last character 
+of a file whas a Cyrillic character and one by Bartłomiej Pietrzyk, who managed to 
+improve performance significantly.
+
+  Upgraded the source code to Maven 3.  It will probably not build anymore using Maven 2.
+
+  To be honest, I haven't been keeping a very close eye on the mailing list, so the 
+response-time to your patches may seem very long to you.  You are right!  Anyway, I
+want to take this opportunity to express my gratitude to everyone who has contributed patches.
+Thank you!  
+
+* 29 November 2010.  Beta 09.
+
+  Applied patch by Evgeniy Romanchenko which solved a the following bug.  The filtering of soft returns
+from a string value was broken.  A soft return is 0x8d followed by 0x0a.  However if a 0x8d appeared 
+by itself, it and the following character were also filtered, which is incorrect.
+
+* 16 October 2010.  Beta 08.
+
+   With the help of Konrad Borowiecki added the possibility to delete records from the database.  
+As in the original dBase you must first flag the records as deleted (using the deleteRecordAt function) 
+and then remove them physically with a call to pack. Also with the help of Konrad added the function 
+updateRecordAt which modifies an existing record.
+
+* 19 March 2010.  Beta 07.
+
+   "Deleted record" markers led to an infinite loop when reading records. 
+
+* 15 January 2010.  Beta 05.
+    
+   Added constructors to <<<Database>>> and <<<Table>>> that take a character 
+set name.  The string provided here must be one of the strings returned by 
+<<<java.nio.charset.Charset.availableCharsets()>>>.  The specified character set
+will then be used to read and write CHARACTER and MEMO type values from and to
+the DBF files.  Note that, although there is now a <<<getCharsetName>>> on the 
+<<<Table>>> class, no detection of the character set used in existing databases
+is done.  This information must be provided by the calling program!
+
+* 22 December 2009. Beta 04.
+
+    This beta fixes a bug int the Value classes.  It was impossible to write a raw value read from 
+a database to a field with different specifications.  This violated the Value contract.
+
+
+* 3 July 2009.  DANS DataPerfect Library alpha 01.
+
+    Although slightly off-topic, we are taking the opportunity to announce here
+work done on a new library: dans-dp-lib.  DataPerfect is a DOS-based database,
+comparable with dBase in that it had some popularity in the nineties.  Our new
+library will only be able to read DataPerfect databases, but we suspect that that
+is what most people are likely to want.
+
+    The project can be found {{{http://sourceforge.net/projects/dans-dp-lib/files/}here on SourceForge}}.
+
+
+* 26 June 2009.  Beta 03!!!
+
+    FoxPro 2.6 files can now also be read and written.  This brings the list of supported DBF versions to:
+
+    * dBase III+
+   
+    * dBase IV
+
+    * dBase V
+
+    * Clipper 5
+
+    * FoxPro 2.6
+
+
+* 8 June 2009. Beta 02!!
+
+    The library has grown another couple of K.  We added Clipper 5 support and made the
+API a little bit more flexible and robust.  You can now write Number objects to
+CHARACTER fields or Strings containing numbers to NUMBER fields, etc.  For the
+overview of all the validations see {{{./apidocs/nl/knaw/dans/common/dbflib/Record.html}Javadoc for the Record class}}.
+
+    Please, give us your feed-back.  The previous versions have been downloaded about 200 times
+from several sites, but so far we have had no comments or bug reports.  If you would
+like to see new features, or find bugs or if you can contribute sample DBFs, please
+{{{https://lists.sourceforge.net/lists/listinfo/dans-dbf-lib-users}contact us!}}  We are especially interested in a copy of dBase II, FoxBase and FoxPro
+to generate test files.  If nothing else, please {{{http://apps.sourceforge.net/aguestbook/dans-dbf-lib/}sign the guestbook}} ...
+
+
+* 12 May 2009.  Beta 01!
+
+    Today we released the first beta version of DANS DBF Library.  That means we feel
+fairly confident that it can actually be used in a project.  Beta 01 includes support
+for dBase III+, IV and V.
+
+
+* 24 April 2009.  Alpha 06
+
+    DBFs with missing end of file byte could not be read properly.  Fixed that.  Also
+updated the web-site with one example.
+
+* 23 April 2009.  Added Usage page
+
+    Every self-respecting library needs its "QuickStart Guide," or "Getting Started,"
+or "Usage" page, so we have added one.  Find out in under five minutes how to use
+DANS DBF Library {{{./usage.html}here!}}
+
+* 23 April 2009.  Alpha 05
+
+    "Release early, release often," is was SourceForge tells us.  Maybe we are taking
+that a little bit too literally, but anyway, here is Alpha 05, within 2 weeks.  We have
+changed the API a little bit, after all we are still alpha, so we are allowed to do that.
+Once we go beta (which should be soon) we will keep the API more stable.

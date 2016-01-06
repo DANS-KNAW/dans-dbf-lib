@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="${project.name}">
+    <bannerLeft>
+        <src>images/logos/dans_dbf.gif</src>
+    </bannerLeft>
+
+    <body>
+        <links>
+            <item name="DANS" href="http://www.dans.knaw.nl/"/>
+            <item name="KNAW" href="http://www.knaw.nl/"/>
+            <item name="NWO" href="http://www.nwo.nl/"/>
+        </links>
+
+        <menu name="Documentation" inheritance="none">
+            <item name="Overview" href="index.html"/>
+            <item name="Usage" href="usage.html" />
+            <item name="Examples" href="examples.html" />
+            <item name="Javadocs" href="http://dans-dbf-lib.sourceforge.net/apidocs/index.html" />
+            <item name="References" href="references.html" />
+        </menu>
+
+        <menu name="Sourceforge Project" >
+            <item name="Overview/Download" href="http://sourceforge.net/projects/dans-dbf-lib/files" />
+            <item name="Mailing List" href="./mail-lists.html" />
+            <item name="Issue Tracking" href="http://sourceforge.net/tracker/?group_id=258772" />
+        </menu>
+
+        <menu ref="reports" />
+    </body>
+</project>

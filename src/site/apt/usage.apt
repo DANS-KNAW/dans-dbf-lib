@@ -1,0 +1,211 @@
+Usage
+
+    The following is a series of code snippets interspersed with short
+explanations.  The examples use the files
+{{{./MYTABLE.DBF}MYTABLE.DBF}} and
+{{{./MYTABLE.DBT}MYTABLE.DBT}}.
+This code was tested with version alpha 05.
+
+* Opening a DBF File
+
+    Opening an existing file can be done by creating a Table object configuring
+it with an exisitng DBF file.  The File object is a regular java.io.File.
+Before you can read from or write to the file you must open it.  The argument to
+open specifies what to do if the file does not exist.  If you are opening an
+existing file you presumably want it to be an error if the file cannot be found.
+
++------------------------------------------------------------------------------+
+
+Table table = new Table(new File("MYTABLE.DBF"));
+
+try
+{
+    table.open(IfNonExistent.ERROR);
+
+    // ... do your stuff
+
+}
+finally
+{
+    table.close();  // don't forget to close it!
+}
+
++------------------------------------------------------------------------------+
+
+* Creating a new DBF File
+
+    Alternatively you can open a table that does not exist yet.  The code is
+exactly as above, only now you specify IfNonExistent.CREATE.
+
++------------------------------------------------------------------------------+
+
+Table table = new Table(new File("NEWTABLE.DBF"));
+
+try
+{
+    table.open(IfNonExistent.CREATE);
+
+    // ... do your stuff
+
+}
+finally
+{
+    table.close();  // don't forget to close it!
+}
+
++------------------------------------------------------------------------------+
+
+
+* Getting the Field Descriptions
+
+    What in modern databases are called columns are called in dBase fields.  You
+can get the list of field descriptions from a table after opening it.  Each
+field has four properties:
+
+    * Name
+
+    * Type
+
+    * Length
+
+    * Decimal Count
+
+    []
+
+    The length property is fixed for some types.  For instance a DATE is always
+8 long.  The Decimal Count is really only applicable to NUMBERs.  The other
+types always return 0;
+
+
++------------------------------------------------------------------------------+
+
+List<Field> fields = table.getFields();
+
+for (final Field field : fields)
+{
+    System.out.println("Name:         " + field.getName());
+    System.out.println("Type:         " + field.getType());
+    System.out.println("Length:       " + field.getLength());
+    System.out.println("DecimalCount: " + field.getDecimalCount());
+    System.out.println();
+}
+
++------------------------------------------------------------------------------+
+
+* Iterating Through Records and Retrieving Data
+
+    To iterate through the records, get a record iterator.  Each record lets you
+get the field data with one of the following methods:
+
+    * getXxxValue(fieldName): retrieves an object of the appropriate type (Number
+for NUMBER or FLOAT fields, String for CHARACTER or MEMO field, Boolean for
+LOGICAL and java.util.Date for DATE.
+
+    * getRawValue(fieldName): returns a byte array containing the value as found in
+the DBF file.
+
+    []
+
++------------------------------------------------------------------------------+
+
+Iterator<Record> iterator = table.recordIterator();
+
+while (iterator.hasNext())
+{
+    Record record = iterator.next();
+
+    Number nv = record.getNumberValue("NUMFLD");
+
+    // Convert to a primitive before comparing
+    if (nv != null && nv.intValue() == 2)
+    {
+        System.out.println("Well, what do you know? numfld was 2!");
+    }
+
+    // Get all the bytes from the memo field including
+    // "soft returns" (0x8d 0x0a)
+    byte[] memoData = record.getRawValue(new Field("MEMOFLD", Type.MEMO));
+
+    if (memoData == null)
+    {
+        System.out.println("No memo data");
+    }
+    else
+    {
+        System.out.println("Raw memo data: " + new String(memoData));
+    }
+
+    // Get the memo data as a String, with no soft returns.
+    String memoString = record.getStringValue("MEMOFLD");
+
+    System.out.println("Memo date as string: " + memoString);
+}
+
++------------------------------------------------------------------------------+
+
+* Adding a Record
+
+    A record is basically a map of field names to values.  You can create the
+record and then add it, or use the method Table.addRecord.
+
++------------------------------------------------------------------------------+
+
+// The hard way ...
+final Map<String, Value> map = new HashMap<String, Value>();
+map.put("NUMFLD", new NumberValue(17));
+map.put("LOGICFLD", new BooleanValue(true));
+map.put("CHARFLD", new StringValue("This is a new string"));
+map.put("MEMOFLD", new StringValue("This could be a very long string"));
+map.put("DATEFLD", new DateValue(Calendar.getInstance().getTime()));
+Record record = new Record(map);
+table.addRecord(record);
+
+// The easy way ...
+// The values have to be of the appropriate type and in the same order as the corresponding fields
+// in the list returned by Table.getFields();
+table.addRecord(18, false, "Another new string", "Another long string", Calendar.getInstance().getTime());
+
+// The even easier way ... (since beta 02)
+// The values do not have to be of the exact corresponding type as the database field anymore.
+// Some conversions are done.
+table.addRecord("19", "T", 3.14159, 2.71828, "20090608");
+// Parses the string "19" as a NUMBER, Writes the String "T" (true) to a LOGICAL field,
+// Writes pi to a CHARACTER field, writes e to a MEMO field and "20090608" to a DATE field.
+
++------------------------------------------------------------------------------+
+
+* Using the Database Class
+
+    It is also possible to work with a slightly higher level of abstraction.  DANS DBF Library
+considers a directory containing DBF and supporting files a database.  You can open
+or create a database by instantiating a Database object.
+
++------------------------------------------------------------------------------+
+
+Database database = new Database(new File("newdatabase"), Version.DBASE_3);
+List<Field> fields = new ArrayList<Field>();
+fields.add(new Field("ID", Type.NUMBER, 3));
+fields.add(new Field("NAME", Type.CHARACTER, 25));
+fields.add(new Field("DESCR", Type.MEMO));
+fields.add(new Field("ADDED", Type.DATE));
+
+Table personTable = database.addTable("PERSON", fields);
+
+try
+{
+    personTable.open(IfNotExists.CREATE);
+
+    // ... work with person Table.
+
+}
+finally
+{
+    personTable.close();
+}
+
++------------------------------------------------------------------------------+
+
+
+
+
+

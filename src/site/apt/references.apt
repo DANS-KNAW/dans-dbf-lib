@@ -1,0 +1,21 @@
+References
+
+* About dBase and DBF
+
+   * {{{http://en.wikipedia.org/wiki/Dbf#File_formats}Wikipedia article on dBase}}
+
+   * {{{http://www.clicketyclick.dk/databases/xbase/format/index.html}DBF file format description}}
+
+   * {{{http://www.geocities.com/geoff_wass/dBASE/GaryWhite/dBASE/index.html}Gary White's site on dBase}}
+
+   * {{{http://www.geocities.com/geoff_wass/dBASE/GaryWhite/dBASE/FAQ/qfloat.htm}In particular: Gary White's article on Floats}}
+
+* Other DBF Libraries and Tools
+
+    * {{{https://javadbf.dev.java.net/}JavaDBF (br.com.softsite.sfc.tini.persistence)}} 
+
+    * {{{http://sarovar.org/projects/javadbf/}Another JavaDBF (com.linuxense.javadbf)}} 
+
+    * {{{http://code.google.com/p/java-dbf/}JDBF (com.hexiong.jdbf)}} 
+
+    * {{{http://www.codeplex.com/fastdbf/}FastDBF (in C#)}}

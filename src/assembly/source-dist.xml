@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<assembly>
+    <id>src</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>.</directory>
+            <excludes>
+                <exclude>target</exclude>
+                <exclude>target/**</exclude>
+            </excludes>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>

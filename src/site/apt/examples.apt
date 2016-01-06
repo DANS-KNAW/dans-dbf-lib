@@ -1,0 +1,12 @@
+Example Programs
+
+    Here are some (currently one) example programs that show how to use
+DANS DBF Library.  To look at the code you can follow the links below or look in
+the examples directory of the source distribution.  The source distribution
+contains a complete {{{http://maven.apache.org/}Maven 2}} project per example.
+
+* dump-table
+
+    This program takes the name of a DBF file and prints the field information
+and records to the standard output.  The source is a single file, which can be
+found {{{./DumpTable.java}here}}.
