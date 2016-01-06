@@ -70,6 +70,7 @@
                         <exclude>LICENSE</exclude>
                         <exclude>**/README</exclude>
                         <exclude>src/test/resources/**</exclude>
+                        <exclude>src/site/resources/**</exclude>
                         <exclude>src/main/resources/**</exclude>
                     </excludes>
                 </configuration>
