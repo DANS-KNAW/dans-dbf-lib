@@ -148,6 +148,7 @@ public class Table
     private final String charsetName;
     private Memo memo = null;
     private RandomAccessFile raFile = null;
+    private String accessMode;
 
     /**
      * Creates a new <code>Table</code> object. A {@link File} object representing the
@@ -268,14 +269,31 @@ public class Table
     public void open(final IfNonExistent ifNonExistent)
               throws IOException, CorruptedTableException
     {
+        open("rw", ifNonExistent);
+    }
+
+    /**
+     * Opens the table with given file access mode.
+     *
+     * @param mode file access mode, either "r" or "rw"
+     * @param ifNonExistent what to do if the table file does not exist yet
+     *
+     * @throws IOException if the table does not exist or could be opened
+     * @throws CorruptedTableException if the header of the table file was corrupt
+     */
+    public void open(final String mode, final IfNonExistent ifNonExistent)
+              throws IOException, CorruptedTableException
+    {
         if (tableFile.exists())
         {
-            raFile = new RandomAccessFile(tableFile, "rw");
+            raFile = new RandomAccessFile(tableFile, mode);
+            accessMode = mode;
             header.readAll(raFile);
         }
         else if (ifNonExistent.isCreate())
         {
-            raFile = new RandomAccessFile(tableFile, "rw");
+            raFile = new RandomAccessFile(tableFile, mode);
+            accessMode = mode;
             header.writeAll(raFile);
         }
         else if (ifNonExistent.isError())
@@ -524,7 +542,7 @@ public class Table
     private int writeMemo(final byte[] memoText)
                    throws IOException, CorruptedTableException
     {
-        ensureMemoOpened(IfNonExistent.CREATE);
+        ensureMemoOpened(accessMode, IfNonExistent.CREATE);
 
         return memo.writeMemo(memoText);
     }
@@ -548,7 +566,7 @@ public class Table
     private byte[] readMemo(final String memoIndex)
                      throws IOException, CorruptedTableException
     {
-        ensureMemoOpened(IfNonExistent.ERROR);
+        ensureMemoOpened(accessMode, IfNonExistent.ERROR);
 
         if (memoIndex.trim().isEmpty())
         {
@@ -558,7 +576,7 @@ public class Table
         return memo.readMemo(Integer.parseInt(memoIndex.trim()));
     }
 
-    private void ensureMemoOpened(final IfNonExistent ifNonExistent)
+    private void ensureMemoOpened(final String mode, final IfNonExistent ifNonExistent)
                            throws IOException, CorruptedTableException
     {
         if (memo != null)
@@ -566,7 +584,7 @@ public class Table
             return;
         }
 
-        openMemo(ifNonExistent);
+        openMemo(mode, ifNonExistent);
     }
 
     private void ensureMemoClosed()
@@ -588,12 +606,13 @@ public class Table
     /**
      * Opens the memo of this table.
      *
+     * @param mode file access mode
      * @param ifNonExistent what to do if the memo file does not exist. (Cannot be IGNORE.)
      * @throws IOException if the memo file could not be opened
      * @throws CorruptedTableException if the memo file could not be found or multiple matches
      *             exist, or if it is corrupt
      */
-    private void openMemo(final IfNonExistent ifNonExistent)
+    private void openMemo(final String mode, final IfNonExistent ifNonExistent)
                    throws IOException, CorruptedTableException
     {
         File memoFile = Util.getMemoFile(tableFile,
@@ -622,7 +641,7 @@ public class Table
         memo =
             new Memo(memoFile,
                      header.getVersion());
-        memo.open(ifNonExistent);
+        memo.open(mode, ifNonExistent);
     }
 
     /**

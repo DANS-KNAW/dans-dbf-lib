@@ -301,4 +301,10 @@ class UnitTestUtil
             }
         }
     }
+
+    static boolean setReadOnly(final File inDir, final String inFileName)
+            throws IOException
+    {
+        return new File(inDir, inFileName).setReadOnly();
+    }
 }
