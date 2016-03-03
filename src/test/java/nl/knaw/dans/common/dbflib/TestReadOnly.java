@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2016 Simon Chenery
+ * Copyright (C) 2009-2016 DANS - Data Archiving and  Networked Services (info@dans.knaw.nl)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
