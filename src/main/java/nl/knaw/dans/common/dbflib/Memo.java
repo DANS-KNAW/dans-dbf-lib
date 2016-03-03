@@ -75,12 +75,12 @@ class Memo
         this.version = version;
     }
 
-    void open(final IfNonExistent ifNonExistent)
+    void open(final String mode, final IfNonExistent ifNonExistent)
        throws IOException
     {
         if (memoFile.exists())
         {
-            raf = new RandomAccessFile(memoFile, "rw");
+            raf = new RandomAccessFile(memoFile, mode);
 
             if (version == Version.FOXPRO_26)
             {
@@ -90,7 +90,7 @@ class Memo
         }
         else if (ifNonExistent.isCreate())
         {
-            raf = new RandomAccessFile(memoFile, "rw");
+            raf = new RandomAccessFile(memoFile, mode);
 
             if (version == Version.CLIPPER_5)
             {
