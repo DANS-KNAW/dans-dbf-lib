@@ -22,34 +22,28 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
-public class DansDemo
+public class DansDbfDemo
 {
-  public static void main(String []args)
+  public static void main(String []args) throws Exception
   {
-    try
+    File dbfFile = new File("src/test/resources/dbase3plus/cars/cars.dbf");
+    Table table = new Table(dbfFile);
+    table.open(IfNonExistent.ERROR);
+    List<Field> fields = table.getFields();
+    Iterator<Record> it = table.recordIterator();
+    while (it.hasNext())
     {
-      Table table = new Table(new File("/tmp", "cars.dbf"));
-      table.open(IfNonExistent.ERROR);
-      List<Field> fields = table.getFields();
-      Iterator<Record> it = table.recordIterator();
-      while (it.hasNext())
+      Record record = it.next();
+      for (Field field: fields)
       {
-        Record record = it.next();
-        for (Field field: fields)
-        {
-          System.out.print(field.getName());
-          System.out.print(": ");
-          System.out.print(field.getType());
-          System.out.print(": ");
-          System.out.println(record.getTypedValue(field.getName()));
-        }
+        System.out.print(field.getName());
+        System.out.print(": ");
+        System.out.print(field.getType());
+        System.out.print(": ");
+        System.out.println(record.getTypedValue(field.getName()));
       }
-      table.close();
     }
-    catch (Exception e)
-    {
-      e.printStackTrace();
-    }
+    table.close();
   }
 }
 ```
