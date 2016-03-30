@@ -156,6 +156,17 @@ public class TestUtil
      * See test method name.
      */
     @Test
+    public void getDbtFile_if_no_directory()
+    {
+        File dbtFile = Util.getMemoFile(new File("x.DBF"),
+                                        Version.DBASE_5);
+        assertNull("Found non-existing .DBT", dbtFile);
+    }
+
+    /**
+     * See test method name.
+     */
+    @Test
     public void getNumberOfDigits()
     {
         assertEquals(1,

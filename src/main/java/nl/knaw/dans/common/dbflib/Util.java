@@ -141,7 +141,9 @@ class Util
             extension = ".dbt";
         }
 
-        final String parentDirName = dbfFile.getParent();
+        String parentDirName = dbfFile.getParent();
+        if (parentDirName == null)
+            parentDirName = dbfFile.getAbsoluteFile().getParent();
         final File parentDir = new File(parentDirName);
         final String dbfBaseName = stripExtension(dbfFile.getName());
 
