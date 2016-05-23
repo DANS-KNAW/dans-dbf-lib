@@ -29,6 +29,7 @@
 		<name>DANS</name>
 		<url>http://www.dans.knaw.nl/en</url>
 	</organization>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
