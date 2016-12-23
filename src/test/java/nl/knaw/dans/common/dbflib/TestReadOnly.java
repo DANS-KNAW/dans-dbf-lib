@@ -18,13 +18,15 @@ package nl.knaw.dans.common.dbflib;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Test;
+
+import org.junit.runner.RunWith;
+
+import org.junit.runners.Parameterized;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 /**
  * Tests read only access to files.
@@ -51,7 +53,7 @@ public class TestReadOnly
      */
     @Test
     public void openReadOnly()
-                    throws IOException, CorruptedTableException
+                      throws IOException, CorruptedTableException
     {
         Table table = null;
 
@@ -82,10 +84,11 @@ public class TestReadOnly
              * Check that DBF file really is read.
              */
             recordIterator.next();
+
             Record r = recordIterator.next();
             assertEquals(2000,
                          r.getNumberValue("YEAR"));
-        
+
             r = recordIterator.next();
 
             /*
@@ -97,13 +100,15 @@ public class TestReadOnly
         finally
         {
             if (table != null)
+            {
                 table.close();
+            }
         }
     }
 
     @Test(expected = IOException.class)
     public void deleteRecordReadOnly()
-                throws IOException, CorruptedTableException
+                              throws IOException, CorruptedTableException
     {
         Table table = null;
 
@@ -132,13 +137,15 @@ public class TestReadOnly
         finally
         {
             if (table != null)
+            {
                 table.close();
+            }
         }
     }
 
     @Test(expected = IOException.class)
     public void addRecordReadOnly()
-                throws IOException, DbfLibException
+                           throws IOException, DbfLibException
     {
         Table table = null;
 
@@ -162,6 +169,7 @@ public class TestReadOnly
 
             table = new Table(new File(outputDir, "cars.dbf"));
             table.open("r", IfNonExistent.ERROR);
+
             final Iterator<Record> recordIterator = table.recordIterator();
             Record r = recordIterator.next();
             table.addRecord(r);
@@ -169,13 +177,15 @@ public class TestReadOnly
         finally
         {
             if (table != null)
+            {
                 table.close();
+            }
         }
     }
 
     @Test(expected = IOException.class)
     public void updateRecordReadOnly()
-                throws IOException, DbfLibException
+                              throws IOException, DbfLibException
     {
         Table table = null;
 
@@ -199,6 +209,7 @@ public class TestReadOnly
 
             table = new Table(new File(outputDir, "cars.dbf"));
             table.open("r", IfNonExistent.ERROR);
+
             final Iterator<Record> recordIterator = table.recordIterator();
             Record r = recordIterator.next();
             table.updateRecordAt(2, r);
@@ -206,13 +217,15 @@ public class TestReadOnly
         finally
         {
             if (table != null)
+            {
                 table.close();
+            }
         }
     }
 
     @Test(expected = IOException.class)
     public void packReadOnly()
-                throws IOException, DbfLibException
+                      throws IOException, DbfLibException
     {
         Table table = null;
 
@@ -241,7 +254,9 @@ public class TestReadOnly
         finally
         {
             if (table != null)
+            {
                 table.close();
+            }
         }
     }
 }

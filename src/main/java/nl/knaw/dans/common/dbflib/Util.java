@@ -142,8 +142,12 @@ class Util
         }
 
         String parentDirName = dbfFile.getParent();
+
         if (parentDirName == null)
+        {
             parentDirName = dbfFile.getAbsoluteFile().getParent();
+        }
+
         final File parentDir = new File(parentDirName);
         final String dbfBaseName = stripExtension(dbfFile.getName());
 

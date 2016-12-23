@@ -43,6 +43,11 @@ public class Table
     private static final int MARKER_RECORD_DELETED = 0x2A;
     private static final int MARKER_EOF = 0x1A;
     private static final int MARKER_RECORD_VALID = 0x20;
+    private static final int DEFAULT_BUFFER_SIZE = 1000000;
+    private static final int DEFAULT_RECORD_ARRAY_LIST_SIZE = 10000;
+    private byte[] buffer = null;
+    private int startBufferedRecord = 0;
+    private int nBufferedRecord = 0;
 
     private class RecordIterator
         implements Iterator<Record>
@@ -647,30 +652,30 @@ public class Table
                      header.getVersion());
         memo.open(mode, ifNonExistent);
     }
-    
-    private static final int DEFAULT_BUFFER_SIZE = 1000000;
-    private static final int DEFAULT_RECORD_ARRAY_LIST_SIZE = 10000;
-    private byte[] buffer = null;
-    private int startBufferedRecord = 0;
-    private int nBufferedRecord = 0;
-    
+
     /**
      * Read raw data for a number of rows that can fit into the buffer
      * @param startIndex Index of first record
      * @param bufferSize Buffer size to be used to store the raw data
-     * @throws IOException 
+     * @throws IOException
      */
-    private void bufferRecords(final int startIndex, final int bufferSize) throws IOException {
-        if (buffer == null || startIndex < startBufferedRecord || startIndex >= startBufferedRecord + nBufferedRecord) {
+    private void bufferRecords(final int startIndex, final int bufferSize)
+                        throws IOException
+    {
+        if (buffer == null || startIndex < startBufferedRecord || startIndex >= startBufferedRecord + nBufferedRecord)
+        {
             startBufferedRecord = startIndex;
-            nBufferedRecord = Math.max(Math.min(bufferSize / header.getRecordLength(), header.getRecordCount() - startIndex + 1), 1);
+            nBufferedRecord =
+                Math.max(Math.min(bufferSize / header.getRecordLength(), header.getRecordCount() - startIndex + 1),
+                         1);
+
             final int allocatedBufferSize = nBufferedRecord * header.getRecordLength();
             buffer = new byte[allocatedBufferSize];
             jumpToRecordAt(startIndex);
             raFile.read(buffer);
         }
     }
-    
+
     /**
      * Get a specified number of records starting at a given index.
      * @param startIndex Index of the first record to be read
@@ -679,34 +684,45 @@ public class Table
      * @param includeDeleted Include deleted records
      * @return List of Record objects
      * @throws IOException
-     * @throws CorruptedTableException 
+     * @throws CorruptedTableException
      */
-    public List<Record> getRecordsAt(final int startIndex, final int nRecords, final int bufferSize, final boolean includeDeleted) throws IOException, CorruptedTableException {
+    public List<Record> getRecordsAt(final int startIndex, final int nRecords, final int bufferSize,
+                                     final boolean includeDeleted)
+                              throws IOException, CorruptedTableException
+    {
         checkOpen();
-                
+
         final ArrayList<Record> records = new ArrayList<Record>(DEFAULT_RECORD_ARRAY_LIST_SIZE);
-        
+
         int currentRecord = startIndex;
         DataInput dataInput = null;
-        while(currentRecord < header.getRecordCount() && currentRecord < startIndex + nRecords) {
-            if(currentRecord < startBufferedRecord || currentRecord >= startBufferedRecord + nBufferedRecord) {
+
+        while (currentRecord < header.getRecordCount() && currentRecord < startIndex + nRecords)
+        {
+            if (currentRecord < startBufferedRecord || currentRecord >= startBufferedRecord + nBufferedRecord)
+            {
                 bufferRecords(currentRecord, bufferSize);
                 dataInput = null;
             }
-            if (dataInput == null) {
+
+            if (dataInput == null)
+            {
                 dataInput = new DataInputStream(new ByteArrayInputStream(buffer));
             }
-            
+
             final Record record = getRecord(dataInput);
-            if (includeDeleted || !record.isMarkedDeleted()) {
+
+            if (includeDeleted || ! record.isMarkedDeleted())
+            {
                 records.add(record);
             }
+
             currentRecord++;
         }
-        
+
         return records;
     }
-    
+
     /**
      * Get a specified number of records starting at a given index.
      * @param startIndex Index of the first record to be read
@@ -714,35 +730,45 @@ public class Table
      * @param includeDeleted Include deleted records
      * @return List of Record objects
      * @throws IOException
-     * @throws CorruptedTableException 
+     * @throws CorruptedTableException
      */
-    public List<Record> getRecordsAt(final int startIndex, final int nRecords, boolean includeDeleted) throws IOException, CorruptedTableException {
+    public List<Record> getRecordsAt(final int startIndex, final int nRecords, boolean includeDeleted)
+                              throws IOException, CorruptedTableException
+    {
         return getRecordsAt(startIndex, nRecords, DEFAULT_BUFFER_SIZE, includeDeleted);
     }
-    
+
     /**
      * Get a specified number of records starting at a given index. Deleted records are excluded.
      * @param startIndex Index of the first record to be read
      * @param nRecords Number of records to be read
      * @return List of Record objects
      * @throws IOException
-     * @throws CorruptedTableException 
+     * @throws CorruptedTableException
      */
-    public List<Record> getRecordsAt(final int startIndex, final int nRecords) throws IOException, CorruptedTableException {
+    public List<Record> getRecordsAt(final int startIndex, final int nRecords)
+                              throws IOException, CorruptedTableException
+    {
         return getRecordsAt(startIndex, nRecords, DEFAULT_BUFFER_SIZE, false);
     }
-    
+
     /**
      * Get all records, specifying if deleted records should be included
      * @param includeDeleted Include deleted records
      * @param bufferSize Specified size of buffer used to read raw data
      * @return List of Record objects
      * @throws IOException
-     * @throws CorruptedTableException 
+     * @throws CorruptedTableException
      */
-    public List<Record> getAllRecords(final boolean includeDeleted, final int bufferSize) throws IOException, CorruptedTableException {
+    public List<Record> getAllRecords(final boolean includeDeleted, final int bufferSize)
+                               throws IOException, CorruptedTableException
+    {
         checkOpen();
-        return getRecordsAt(0, header.getRecordCount(), bufferSize, includeDeleted);
+
+        return getRecordsAt(0,
+                            header.getRecordCount(),
+                            bufferSize,
+                            includeDeleted);
     }
 
     /**
@@ -750,25 +776,36 @@ public class Table
      * @param bufferSize Specified size of buffer used to read raw data
      * @return List of Record objects
      * @throws IOException
-     * @throws CorruptedTableException 
+     * @throws CorruptedTableException
      */
-    public List<Record> getAllRecords(final int bufferSize) throws IOException, CorruptedTableException {
+    public List<Record> getAllRecords(final int bufferSize)
+                               throws IOException, CorruptedTableException
+    {
         checkOpen();
-        return getRecordsAt(0, header.getRecordCount(), bufferSize, false);
+
+        return getRecordsAt(0,
+                            header.getRecordCount(),
+                            bufferSize,
+                            false);
     }
 
     /**
      * Get all non deleted records
      * @return List of Record objects
      * @throws IOException
-     * @throws CorruptedTableException 
+     * @throws CorruptedTableException
      */
-    public List<Record> getAllRecords() throws IOException, CorruptedTableException {
+    public List<Record> getAllRecords()
+                               throws IOException, CorruptedTableException
+    {
         checkOpen();
-        return getRecordsAt(0, header.getRecordCount(), DEFAULT_BUFFER_SIZE, false);
+
+        return getRecordsAt(0,
+                            header.getRecordCount(),
+                            DEFAULT_BUFFER_SIZE,
+                            false);
     }
-    
-    
+
     /**
      * Returns the record at index. If the index points to a record beyond the last a
      * {@link NoSuchElementException} is thrown. Attention: records marked as deleted <em>are</em>
@@ -790,24 +827,29 @@ public class Table
         }
 
         jumpToRecordAt(index);
-        
+
         /* Read one record worth of raw data and construct a
            ByteArrayInputStream backed by a byte array */
         byte[] buffer = new byte[header.getRecordLength()];
         raFile.read(buffer);
+
         DataInput dataInput = new DataInputStream(new ByteArrayInputStream(buffer));
-        
-        try {
+
+        try
+        {
             return getRecord(dataInput);
-        } catch (NoSuchElementException ex) {
+        }
+        catch (NoSuchElementException ex)
+        {
             throw new NoSuchElementException(String.format("Invalid index: %d", index));
         }
     }
-    
-    Record getRecord(DataInput dataInput) throws IOException, CorruptedTableException {
 
+    Record getRecord(DataInput dataInput)
+              throws IOException, CorruptedTableException
+    {
         final byte firstByteOfRecord = dataInput.readByte();
-        
+
         /*
          * This should actually not be possible, as we already checked the index against the record
          * count. Checking anyway to be on the safe side.
@@ -872,9 +914,8 @@ public class Table
             }
         }
 
-        return new Record(firstByteOfRecord == MARKER_RECORD_DELETED, recordValues);        
+        return new Record(firstByteOfRecord == MARKER_RECORD_DELETED, recordValues);
     }
-    
 
     /**
      * Physically remove the records currently flagged as "deleted".
