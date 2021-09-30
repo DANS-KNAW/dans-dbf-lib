@@ -151,7 +151,7 @@ public class Table {
     }
 
     private boolean lock(Integer index) {
-        // recordOffset = m_head.RecordOffset + index * m_head.RecordWidth;
+        // recordOffset = m_head.RecordOffset + index * m_head.RecordWidth; //only for foxpro xbase
         long offset = 0x40000000L + getHeaderLength() + index * getRecordLength();
         DWORD low_offset = new DWORD(offset);
         DWORD high_offset = new DWORD(offset >> 32);
@@ -205,7 +205,7 @@ public class Table {
         this.charsetName = charsetName == null ? Charset.defaultCharset().name() : charsetName;
         Table.charset = this.charsetName;
         Charset.forName(this.charsetName);
-        // kernel32.dll方式打开dbf 用于锁定记录
+        //  open dbf by kernel32.dll for lock and unlock
         final int GENERIC_READ = 0x80000000;
         final int FILE_SHARE = 0x00000003;
         WinBase.SECURITY_ATTRIBUTES SECURITY_ATTRIBUTES = null;
@@ -481,11 +481,11 @@ public class Table {
                 if (lock(index)) {
                     updateRecordAt(index, record);
                 } else {
-                    throw new IOException("记录锁定失败" + index);
+                    throw new IOException("lock failed:" + index);
                 }
             } finally {
                 if (!unlock(index)) {
-                    throw new IOException("记录解锁失败，这一般不太会发生" + index);
+                    throw new IOException("unlock failed:" + index);
                 }
             }
         } else {
@@ -502,7 +502,7 @@ public class Table {
             byte[] raw = record.getRawValue(field);
             recordOffset += field.getLength();
             if (raw == null) {// if null then skip the field by gq
-                raFile.seek(header.getLength() + (index * header.getRecordLength()) + recordOffset);
+                raFile.seek(header.getLength() + (index * header.getRecordLength()) + recordOffset + 1);
                 continue;
             } else if (field.getType() == Type.MEMO || field.getType() == Type.BINARY
                     || field.getType() == Type.GENERAL) {
