@@ -198,9 +198,9 @@ public class Record
      *
      * public Record searchSomeNum(final double val)
      * {
-     *      //
+     *      /
      *      //... SOME CODE HERE THAT RETRIEVES table1 ...
-     *      //
+     *      /
      *
      *      // Get a record iterator to loop over all the records.
      *      Iterator<Record> ri = table1.recordIterator();

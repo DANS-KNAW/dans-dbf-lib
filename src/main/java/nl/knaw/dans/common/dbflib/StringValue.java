@@ -24,9 +24,7 @@ import java.nio.charset.Charset;
  *
  * @author Jan van Mansum
  */
-public class StringValue
-    extends Value
-{
+public class StringValue extends Value {
     private final String charsetName;
     static final int MAX_CHARFIELD_LENGTH_DBASE = 253;
 
@@ -34,10 +32,10 @@ public class StringValue
      * Creates a new StringValue object.
      *
      * @param stringValue aString
-     * @param charsetName the character set to use when encoding and decoding this string value
+     * @param charsetName the character set to use when encoding and decoding this
+     *                    string value
      */
-    public StringValue(final String stringValue, final String charsetName)
-    {
+    public StringValue(final String stringValue, final String charsetName) {
         super(stringValue);
         this.charsetName = charsetName;
 
@@ -49,27 +47,21 @@ public class StringValue
      *
      * @param stringValue
      */
-    public StringValue(final String stringValue)
-    {
-        this(stringValue,
-             Charset.defaultCharset().name());
+    public StringValue(final String stringValue) {
+        this(stringValue, Table.charset);
     }
 
-    StringValue(final Field field, final byte[] rawValue, final String charsetName)
-    {
+    StringValue(final Field field, final byte[] rawValue, final String charsetName) {
         super(field, rawValue);
         this.charsetName = charsetName == null ? Charset.defaultCharset().name() : charsetName;
     }
 
     @Override
-    protected Object doGetTypedValue(final byte[] rawValue)
-    {
+    protected Object doGetTypedValue(final byte[] rawValue) {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream(rawValue.length);
 
-        for (int i = 0; i < rawValue.length; ++i)
-        {
-            if (lookingAtSoftReturn(rawValue, i))
-            {
+        for (int i = 0; i < rawValue.length; ++i) {
+            if (lookingAtSoftReturn(rawValue, i)) {
                 ++i;
 
                 continue;
@@ -78,40 +70,32 @@ public class StringValue
             bos.write(rawValue[i]);
         }
 
-        return Util.createString(bos.toByteArray(),
-                                 charsetName);
+        return Util.createString(bos.toByteArray(), charsetName);
     }
 
-    private static boolean lookingAtSoftReturn(final byte[] buffer, final int index)
-    {
+    private static boolean lookingAtSoftReturn(final byte[] buffer, final int index) {
         return index < buffer.length - 1 && buffer[index] == (byte) 0x8d && buffer[index + 1] == (byte) 0x0a;
     }
 
     @Override
-    protected byte[] doGetRawValue(final Field field)
-                            throws ValueTooLargeException
-    {
+    protected byte[] doGetRawValue(final Field field) throws ValueTooLargeException {
         final int fieldLength = field.getLength();
         final byte[] stringBytes = Util.getStringBytes((String) typed, charsetName);
 
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(fieldLength);
 
-        try
-        {
+        try {
             byteArrayOutputStream.write(stringBytes);
 
             /*
-             * Memo data has no maximum length, so we cannot fill up the rest of the field with
-             * zero's, as with the other fields. The maximum length of the memo field refers to the
-             * DBT entry pointer length in the DBF.
+             * Memo data has no maximum length, so we cannot fill up the rest of the field
+             * with zero's, as with the other fields. The maximum length of the memo field
+             * refers to the DBT entry pointer length in the DBF.
              */
-            if (field.getType() != Type.MEMO)
-            {
+            if (field.getType() != Type.MEMO && fieldLength > stringBytes.length) {
                 byteArrayOutputStream.write(Util.repeat((byte) 0x00, fieldLength - stringBytes.length));
             }
-        }
-        catch (final IOException ioException)
-        {
+        } catch (final IOException ioException) {
             assert false : "Writing to ByteArrayOutputStream should not cause an IOException";
 
             throw new RuntimeException(ioException);
