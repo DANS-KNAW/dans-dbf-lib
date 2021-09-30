@@ -142,24 +142,16 @@ public class Table {
     private RandomAccessFile raFile = null;
     private String accessMode;
 
-    public Integer getHeaderLength() {
-        return Short.toUnsignedInt(header.getHeaderLength());
-    }
-
-    public Integer getRecordLength() {
-        return header.getRecordLength();
-    }
-
     private boolean lock(Integer index) {
-        // recordOffset = m_head.RecordOffset + index * m_head.RecordWidth; //only for foxpro xbase
-        long offset = 0x40000000L + getHeaderLength() + index * getRecordLength();
+        // recordOffset = m_head.RecordOffset + index * m_head.RecordWidth;
+        long offset = 0x40000000L + header.getHeaderLength() + index * header.getRecordLength();
         DWORD low_offset = new DWORD(offset);
         DWORD high_offset = new DWORD(offset >> 32);
         return kernel32.LockFile(handle, low_offset, high_offset, new DWORD(0x1L), new DWORD(0x0L));
     }
 
     private boolean unlock(Integer index) {
-        long offset = 0x40000000L + getHeaderLength() + index * getRecordLength();
+        long offset = 0x40000000L + header.getHeaderLength() + index * header.getRecordLength();
         DWORD low_offset = new DWORD(offset);
         DWORD high_offset = new DWORD(offset >> 32);
         return kernel32.UnlockFile(handle, low_offset, high_offset, new DWORD(0x1L), new DWORD(0x0L));
@@ -205,7 +197,7 @@ public class Table {
         this.charsetName = charsetName == null ? Charset.defaultCharset().name() : charsetName;
         Table.charset = this.charsetName;
         Charset.forName(this.charsetName);
-        //  open dbf by kernel32.dll for lock and unlock
+        // open dbf by kernel32.dll for lock and unlock
         final int GENERIC_READ = 0x80000000;
         final int FILE_SHARE = 0x00000003;
         WinBase.SECURITY_ATTRIBUTES SECURITY_ATTRIBUTES = null;
